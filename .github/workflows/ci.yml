@@ -7,9 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +18,17 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pytest
+        run: |
+          pip install pytest
+          pip install -r requirements.txt || true
+
+      - name: Lint (optional)
+        run: |
+          pip install flake8
+          flake8 app.py --max-line-length=120 || true
 
       - name: Run tests
         run: pytest test_app.py -v
+
+      - name: Build check
+        run: python -m py_compile app.py
